@@ -1,7 +1,10 @@
 /**
  * Non crossing inertias
  * By Joan Perals
- * Using the Tablet library by Andres Colubri. 
+ * Using the Tablet library by Andres Colubri.
+ * 
+ * Draw and see what happens. Preferably with a drawing tablet.
+ * See the "keyPressed" function below for options that you can trigger during execution.
  */
  
 import codeanticode.tablet.*;
@@ -42,7 +45,6 @@ void draw() {
     
     if(drawMainThread) {
       pg.line(pmouseX, pmouseY, mouseX, mouseY);
-      //ellipse(mouseX - 10, mouseY - 10, 20, 20);
     }
     
     // Create a new thread if it's time to
@@ -66,31 +68,27 @@ void draw() {
   pg.endDraw();
   image(pg, 0, 0);
 
-  // The current values (pressure, tilt, etc.) can be saved using the saveState() method
-  // and latter retrieved with getSavedxxx() methods:
-  //tablet.saveState();
-  //tablet.getSavedPressure();
 }
 
 void keyPressed() {
   switch(key) {
-    case '1':
+    case '1': // Color (1): golden yellow
       mainThreadColor = color(234, 159, 8);
       break;
-    case '2':
+    case '2': // Color (2): shiny purple
       mainThreadColor = color(162, 85, 135);
       break;
-    case 'c':
+    case 'c': // Random (C)olor
       setMainThreadColor();
       break;
-    case 'm':
+    case 'm': // Toggle draw (M)ain thread
       drawMainThread = !drawMainThread;
-    case 'r':
+    case 'r': // (R)eset
       threads = new ArrayList<LineThread>();
       usedPixels = new boolean[width][height];
       pg.background(bgcolor);
       break;
-    case 's':
+    case 's': // (S)ave frame
       Date date = new Date();
       String formattedDate = new java.text.SimpleDateFormat("yyyy-MM-dd.kk.mm.ss").format(date.getTime());
       saveFrame("screenshots/screenshot-" + formattedDate + "-######.png");
