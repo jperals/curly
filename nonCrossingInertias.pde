@@ -8,9 +8,12 @@ import codeanticode.tablet.*;
 import java.util.Date;
 
 float lineWeight;
-int newThreadEvery = 3,
+color bgcolor = 0, mainThreadColor;
+int newThreadEvery = 2,
     iteration = 0;
 ArrayList<LineThread> threads;
+boolean[][] usedPixels;
+boolean drawMainThread = true;
 
 Tablet tablet;
 
@@ -19,42 +22,30 @@ void setup() {
  
   tablet = new Tablet(this);
   threads = new ArrayList<LineThread>();
+  usedPixels = new boolean[width][height];
+  setMainThreadColor();
   
-  background(0);
-  stroke(255);
+  background(bgcolor);
+  stroke(mainThreadColor);
   smooth();
 }
 
 void draw() {
-  // Instead of mousePressed, one can use the Tablet.isMovement() method, which
-  // returns true when changes not only in position but also in pressure or tilt
-  // are detected in the tablet. 
   if (mousePressed && tablet.isMovement()) {
     lineWeight = max(5 * tablet.getPressure(), lineWeight*4/5); // Prevent stroke lineWeight from dropping abruptly
     strokeWeight(lineWeight);
     
-    // Aside from tablet.getPressure(), which should be available on all pens, 
-    // pen may support:
-    //tablet.getTiltX(), tablet.getTiltY() MOST PENS
-    //tablet.getSidePressure() - AIRBRUSH PEN
-    //tablet.getRotation() - ART or PAINTING PEN    
-    
-    // The tablet getPen methods can be used to retrieve the pen current and 
-    // saved position (requires calling tablet.saveState() at the end of 
-    // draw())...
-    //line(tablet.getSavedPenX(), tablet.getSavedPenY(), tablet.getPenX(), tablet.getPenY());
-    
-    // ...but it is equivalent to simply use Processing's built-in mouse 
-    // variables.
-    line(pmouseX, pmouseY, mouseX, mouseY);
-    //ellipse(mouseX - 10, mouseY - 10, 20, 20);
+    if(drawMainThread) {
+      line(pmouseX, pmouseY, mouseX, mouseY);
+      //ellipse(mouseX - 10, mouseY - 10, 20, 20);
+    }
     
     // Create a new thread if it's time to
     iteration += 1;
-    if(iteration > newThreadEvery) {
+    if(iteration >= newThreadEvery) {
       iteration = 0;
       float angle = atan2(mouseY - pmouseY, mouseX - pmouseX);
-      threads.add(new LineThread(mouseX, mouseY, angle, lineWeight));
+      threads.add(new LineThread(mouseX, mouseY, angle, lineWeight, mainThreadColor));
     }
     
   }
@@ -76,13 +67,30 @@ void draw() {
 
 void keyPressed() {
   switch(key) {
+    case '1':
+      mainThreadColor = color(234, 159, 8);
+      break;
+    case '2':
+      mainThreadColor = color(162, 85, 135);
+      break;
+    case 'c':
+      setMainThreadColor();
+      break;
+    case 'm':
+      drawMainThread = !drawMainThread;
     case 'r':
       threads = new ArrayList<LineThread>();
-      background(0);
+      usedPixels = new boolean[width][height];
+      background(bgcolor);
       break;
     case 's':
       Date date = new Date();
       String formattedDate = new java.text.SimpleDateFormat("yyyy-MM-dd.kk.mm.ss").format(date.getTime());
       saveFrame("screenshots/screenshot-" + formattedDate + "-######.png");
+      break;
   }
+}
+
+void setMainThreadColor() {
+  mainThreadColor = color(random(255), random(255), random(255));
 }
