@@ -14,6 +14,7 @@ int newThreadEvery = 2,
 ArrayList<LineThread> threads;
 boolean[][] usedPixels;
 boolean drawMainThread = true;
+PGraphics pg;
 
 Tablet tablet;
 
@@ -25,18 +26,22 @@ void setup() {
   usedPixels = new boolean[width][height];
   setMainThreadColor();
   
-  background(bgcolor);
-  stroke(mainThreadColor);
-  smooth();
+  pg = createGraphics(width, height);
+  pg.beginDraw();  
+  pg.background(bgcolor);
+  pg.stroke(mainThreadColor);
+  pg.smooth();
+  pg.endDraw();
 }
 
 void draw() {
+  pg.beginDraw();
   if (mousePressed && tablet.isMovement()) {
     lineWeight = max(5 * tablet.getPressure(), lineWeight*4/5); // Prevent stroke lineWeight from dropping abruptly
     strokeWeight(lineWeight);
     
     if(drawMainThread) {
-      line(pmouseX, pmouseY, mouseX, mouseY);
+      pg.line(pmouseX, pmouseY, mouseX, mouseY);
       //ellipse(mouseX - 10, mouseY - 10, 20, 20);
     }
     
@@ -53,12 +58,14 @@ void draw() {
   // Let threads grow
   int nThreads = threads.size();
   for(int i = 0; i < nThreads; i++) {
-    //println("i: " + i);
     LineThread thread = threads.get(i);
     thread.update();
-    thread.draw();
+    thread.draw(pg);
   }
   
+  pg.endDraw();
+  image(pg, 0, 0);
+
   // The current values (pressure, tilt, etc.) can be saved using the saveState() method
   // and latter retrieved with getSavedxxx() methods:
   //tablet.saveState();
@@ -81,7 +88,7 @@ void keyPressed() {
     case 'r':
       threads = new ArrayList<LineThread>();
       usedPixels = new boolean[width][height];
-      background(bgcolor);
+      pg.background(bgcolor);
       break;
     case 's':
       Date date = new Date();

@@ -15,13 +15,13 @@ public class LineThread {
     points = new ArrayList<PVector>();
     addPoint(new PVector(x, y));
   }
-  public void draw() {
+  public void draw(PGraphics pg) {
     if(nextToLastPoint != null && !deadEnd) {
-      pushMatrix();
-      strokeWeight(lineWeight);
-      stroke(threadColor);
-      line(nextToLastPoint.x, nextToLastPoint.y, lastPoint.x, lastPoint.y);
-      popMatrix();
+      pg.pushMatrix();
+      pg.strokeWeight(lineWeight);
+      pg.stroke(threadColor);
+      pg.line(nextToLastPoint.x, nextToLastPoint.y, lastPoint.x, lastPoint.y);
+      pg.popMatrix();
     }
   }
   public void update() {
