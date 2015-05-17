@@ -34,12 +34,7 @@ void setup() {
   setMainThreadColor();
   
   overlay = createGraphics(width, height);
-  pg = createGraphics(width, height);
-  pg.beginDraw();  
-  pg.stroke(mainThreadColor);
-  pg.smooth();
-  pg.endDraw();
-  
+  initDrawingLayer();  
   background(bgcolor);
 
 }
@@ -73,11 +68,6 @@ void draw() {
   }
   
   pg.endDraw();
-  
-  if(bgImage != null) {
-    image(bgImage, 0, 0);
-    image(overlay, 0, 0);
-  }
   image(pg, 0, 0);
 
 }
@@ -102,7 +92,9 @@ void keyPressed() {
     case 'r': // (R)eset
       threads = new ArrayList<LineThread>();
       usedPixels = new boolean[width][height];
-      pg.background(bgcolor);
+      background(bgcolor);
+      setOverlay();
+      initDrawingLayer();
       break;
     case 's': // (S)ave frame
       Date date = new Date();
@@ -139,4 +131,16 @@ void setOverlay() {
   overlay.beginDraw();
   overlay.background(bgcolor, overlayOpacity);
   overlay.endDraw();
+  if(bgImage != null) {
+    image(bgImage, 0, 0);
+  }
+  image(overlay, 0, 0);
+}
+
+void initDrawingLayer() {
+  pg = createGraphics(width, height);
+  pg.beginDraw();  
+  pg.stroke(mainThreadColor);
+  pg.smooth();
+  pg.endDraw();
 }
