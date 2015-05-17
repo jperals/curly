@@ -17,7 +17,11 @@ int newThreadEvery = 2,
 ArrayList<LineThread> threads;
 boolean[][] usedPixels;
 boolean drawMainThread = true;
+PGraphics bg;
+PGraphics overlay;
 PGraphics pg;
+PImage bgImage;
+float overlayOpacity = 127;
 
 Tablet tablet;
 
@@ -29,12 +33,15 @@ void setup() {
   usedPixels = new boolean[width][height];
   setMainThreadColor();
   
+  overlay = createGraphics(width, height);
   pg = createGraphics(width, height);
   pg.beginDraw();  
-  pg.background(bgcolor);
   pg.stroke(mainThreadColor);
   pg.smooth();
   pg.endDraw();
+  
+  background(bgcolor);
+
 }
 
 void draw() {
@@ -66,6 +73,11 @@ void draw() {
   }
   
   pg.endDraw();
+  
+  if(bgImage != null) {
+    image(bgImage, 0, 0);
+    image(overlay, 0, 0);
+  }
   image(pg, 0, 0);
 
 }
@@ -81,8 +93,12 @@ void keyPressed() {
     case 'c': // Random (C)olor
       setMainThreadColor();
       break;
+    case 'f': // Select an image (F)ile to  draw on top of
+      selectInput("Select an image:", "imageSelected");
+      break;
     case 'm': // Toggle draw (M)ain thread
       drawMainThread = !drawMainThread;
+      break;
     case 'r': // (R)eset
       threads = new ArrayList<LineThread>();
       usedPixels = new boolean[width][height];
@@ -93,9 +109,34 @@ void keyPressed() {
       String formattedDate = new java.text.SimpleDateFormat("yyyy-MM-dd.kk.mm.ss").format(date.getTime());
       saveFrame("screenshots/screenshot-" + formattedDate + "-######.png");
       break;
+    case 'x': // Increase overlay opacity (make background image less visible)
+      overlayOpacity = min(255, overlayOpacity + 20);
+      setOverlay();
+      break;
+    case 'z': // Decrease overlay opacity (make background image more visible) 
+      overlayOpacity = max(0, overlayOpacity - 20);
+      setOverlay();
+      break;
   }
 }
 
 void setMainThreadColor() {
   mainThreadColor = color(random(255), random(255), random(255));
+}
+
+void imageSelected(File file) {
+  if (file == null) {
+    println("No file was selected.");
+  }
+  else {
+    String path = file.getAbsolutePath();
+    bgImage = loadImage(path);
+    setOverlay();
+  }
+}
+
+void setOverlay() {
+  overlay.beginDraw();
+  overlay.background(bgcolor, overlayOpacity);
+  overlay.endDraw();
 }
