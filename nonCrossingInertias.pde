@@ -21,12 +21,13 @@ PGraphics bg;
 PGraphics overlay;
 PGraphics pg;
 PImage bgImage;
+PVector bgImagePosition;
 float overlayOpacity = 127;
 
 Tablet tablet;
 
 void setup() {
-  size(1200, 800);
+  size(1800, 1000);
  
   tablet = new Tablet(this);
   threads = new ArrayList<LineThread>();
@@ -48,6 +49,10 @@ void draw() {
     if(drawMainThread) {
       pg.line(pmouseX, pmouseY, mouseX, mouseY);
     }
+    
+    if(mouseX >= 0 && mouseX < width && mouseY >= 0 && mouseY < height) {
+      usedPixels[mouseX][mouseY] = true;
+    } 
     
     // Create a new thread if it's time to
     iteration += 1;
@@ -132,7 +137,8 @@ void setOverlay() {
   overlay.background(bgcolor, overlayOpacity);
   overlay.endDraw();
   if(bgImage != null) {
-    image(bgImage, 0, 0);
+    bgImagePosition = new PVector((width - bgImage.width)/2, (height - bgImage.height)/2);
+    image(bgImage, bgImagePosition.x, bgImagePosition.y);
   }
   image(overlay, 0, 0);
 }
